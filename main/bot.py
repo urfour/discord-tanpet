@@ -45,15 +45,13 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         ]
 
     @commands.command()
+    @commands.has_role('BG suprême')
     async def initchalls(self, ctx):
         """ Initialiser le compteur de challenges """
-        if ctx.author.id != "149195176093548544":
-            await ctx.send("Désolé petit coquinou, tu n'as pas le droit d'utiliser cette commande !")
-        else:
-            members = [[member.id, member.name, 0] for member in ctx.guild.members]
-            self.bot.challs = pd.DataFrame(members, columns=['ID', 'Name', 'Challenges'])
-            self.bot.challs.to_csv('challs.csv')
-            await ctx.send(f"{ctx.author.mention} Compteur initialisé, essayez d'être bons quand même")
+        members = [[member.id, member.name, 0] for member in ctx.guild.members]
+        self.bot.challs = pd.DataFrame(members, columns=['ID', 'Name', 'Challenges'])
+        self.bot.challs.to_csv('challs.csv')
+        await ctx.send(f"{ctx.author.mention} Compteur initialisé, essayez d'être bons quand même")
 
     @commands.command()
     async def infoall(self, ctx):
@@ -81,14 +79,14 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         self.bot.challs[self.bot.challs['ID'] == member.id]['Challenges'] += 1
         await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
 
-class MiscCog(commands.Cog, name='Diverses'):
+class MiscCog(commands.Cog, name='Divers'):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(brief="Dire bonjour (c'est important d'être poli)")
-    async def hello(ctx):
+    async def hello(self, ctx):
         """ Dire bonjour (c'est important d'être poli) """
-        await ctx.send(f'Salut {ctx.author.mention} (ID : {ctx.author.id}) !')
+        await ctx.send(f'Salut {ctx.author.mention} !')
     
     @commands.command()
     async def almanax(self, ctx):
