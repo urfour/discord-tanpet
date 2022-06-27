@@ -18,5 +18,13 @@ async def on_ready():
 async def hello(ctx):
     await ctx.send(f'Salut {ctx.author.name} !')
 
+
+@bot.command()
+async def membres(ctx):
+    to_print = ""
+    for membre in ctx.guild.members:
+        to_print += membre + " : 0 challenge(s) raté(s).\n"
+    await ctx.send(to_print)
+
 if __name__ == "__main__":
     bot.run(TOKEN)
