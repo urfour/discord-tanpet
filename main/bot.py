@@ -69,7 +69,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     FROM challenges
                         """
 
-        results = pd.read_sql(query, cur)
+        results = pd.read_sql(query, con)
         print("INFOALL")
         print(results)
         to_print = ""
@@ -98,9 +98,9 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         query = f"""SELECT * FROM challenges WHERE DiscordID = {member.id}"""
-        challenges = pd.read_sql(query, cur)
+        challenges = pd.read_sql(query, con)
         query2 = f"""UPDATE challenges SET Challenges = {challenges.iloc[0]['Challenges']} WHERE DiscordID = {member.id}"""
-        results = pd.read_sql(query2, cur)
+        results = pd.read_sql(query2, con)
         print(results)
         await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
 
