@@ -27,7 +27,10 @@ bot = commands.Bot(command_prefix='!', description=DESCRIPTION, intents=intents)
 async def on_ready():
     print(f'Connecté en tant que {bot.user} (ID : {bot.user.id})')
     print('------')
-    if engine.execute("SELECT * FROM challenges").fetchone() is None:
+    try:
+        if engine.execute("SELECT * FROM challenges").fetchone() is not None:
+            print(f'Base de données disponible !')
+    except psycopg2.errors.UndefinedTable:
         print(f'Pas de fichier de challenges trouvé, merci de le générer !')
 
 @bot.event
@@ -50,13 +53,12 @@ class ChallengesCog(commands.Cog, name='Challenges'):
     @commands.command()
     @commands.has_role('BG suprême')
     async def initchalls(self, ctx):
-        """ Initialiser le compteur de challenges """
+        """ (Ré)Initialiser le compteur de challenges """
         members = [[member.id, member.name, 0] for member in ctx.guild.members]
-        self.bot.challs = pd.DataFrame(members, columns=['ID', 'Name', 'Challenges'])
-        self.bot.challs.set_index('ID', inplace=True)
-        self.bot.challs.to_sql('challenges', con=engine, if_exists='append')
-        print("Compteur initialisé")
-        await ctx.send(f"{ctx.author.mention} Compteur initialisé, essayez d'être bons quand même")
+        self.bot.challs = pd.DataFrame(members, columns=['DiscordID', 'Name', 'Challenges'])
+        self.bot.challs.to_sql('challenges', con=engine, if_exists='replace')
+        print("Compteur (ré)initialisé")
+        await ctx.send(f"{ctx.author.mention} Compteur (ré)initialisé, essayez d'être bons quand même")
 
     @commands.command()
     async def infoall(self, ctx):
@@ -67,13 +69,12 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     FROM challenges
                         """
 
-        results = pd.read_sql(query, con)
+        results = pd.read_sql(query, cur)
         print("INFOALL")
         print(results)
         to_print = ""
-        for membre in ctx.guild.members:
-            if membre.id != self.bot.user.id:
-                to_print += membre.name + " : " + self.bot.challs.loc[str(membre.id)]['Challenges'] + " challenge(s) raté(s).\n"
+        for _, row in results.iterrows():
+                to_print += f"{row['Name']} : {row['Challenges']} challenge(s) raté(s)\n"
         await ctx.send(to_print)
 
     @commands.command()
@@ -82,7 +83,11 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         if member is None:
             member = ctx.author
 
-        await ctx.send(f"{member.name} a fait rater {self.bot.challs.loc[str(member.id)]['Challenges']} challenge(s) (le nullos)")
+        con = psycopg2.connect(DATABASE_URL)
+        cur = con.cursor()
+        query = f"""SELECT * FROM challenges WHERE DiscordID = {member.id}"""
+        results = pd.read_sql(query, cur)
+        await ctx.send(f"{member.name} a fait rater {self.bot.challs.iloc[0]['Challenges']} challenge(s) (le nullos)")
 
     @commands.command()
     async def addchall(self, ctx, member : discord.Member = None):
@@ -90,7 +95,13 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         if member is None:
             member = ctx.author
 
-        self.bot.challs[str(member.id)]['Challenges'] += 1
+        con = psycopg2.connect(DATABASE_URL)
+        cur = con.cursor()
+        query = f"""SELECT * FROM challenges WHERE DiscordID = {member.id}"""
+        challenges = pd.read_sql(query, cur)
+        query2 = f"""UPDATE challenges SET Challenges = {challenges.iloc[0]['Challenges']} WHERE DiscordID = {member.id}"""
+        results = pd.read_sql(query2, cur)
+        print(results)
         await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
 
 class MiscCog(commands.Cog, name='Divers'):
