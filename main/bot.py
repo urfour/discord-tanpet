@@ -106,10 +106,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     FROM challenges 
                     WHERE discordid = {member.id}"""
         challenges = pd.read_sql(query, con)
-        print("challenges")
-        print(challenges)
         query2 = f"""UPDATE challenges 
-                    SET challenges = {challenges.iloc[0] + 1} 
+                    SET challenges = {(challenges.iloc[0] + 1)} 
                     WHERE discordid = {member.id}"""
         results = pd.read_sql(query2, con)
         print(results)
