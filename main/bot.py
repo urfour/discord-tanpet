@@ -1,9 +1,9 @@
 import os
 import urllib.request
+import datetime
 import discord
 
 from dotenv import load_dotenv
-from datetime import date
 from discord.ext import commands
 
 load_dotenv()
@@ -39,7 +39,7 @@ async def membres(ctx):
 async def almanax(ctx):
     """ Récupère l'Almanax du jour"""
     # Get today date
-    today = date.today()
+    today = datetime.date.today()
     date = today.strftime("%Y-%m-%d")
 
     # Get corresponding Almanax
