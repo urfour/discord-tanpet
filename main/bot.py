@@ -89,7 +89,10 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     FROM challenges 
                     WHERE discordid = {member.id}"""
         results = pd.read_sql(query, con)
-        await ctx.send(f"{member.name} a fait rater {results.iloc[0]['challenges']} challenge(s) (le nullos)")
+        if results.iloc[0]['challenges'] == 0:
+            await ctx.send(f"{member.name} n'a fait rater **aucun** challenge (quel bg !)")
+        else:
+            await ctx.send(f"{member.name} a fait rater {results.iloc[0]['challenges']} challenge(s) (le nullos)")
 
     @commands.command()
     async def addchall(self, ctx, member : discord.Member = None):
@@ -101,7 +104,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         cur = con.cursor()
         query = f"""SELECT * 
                     FROM challenges 
-                    WHERE discordid = {member.id}"""
+                        """
         challenges = pd.read_sql(query, con)
         query2 = f"""UPDATE challenges 
                     SET challenges = {challenges.iloc[0]['challenges']} 
