@@ -12,7 +12,7 @@ from discord.ext import commands
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("HEROKU_POSTGRESQL_CYAN_URL")
+DATABASE_URL = os.environ.get("HEROKU_POSTGRESQL_CYAN_URL")
 TOKEN = os.getenv("DISCORD_TOKEN")
 DESCRIPTION = '''Bot de la guilde Tan pet de puicenss'''
 
