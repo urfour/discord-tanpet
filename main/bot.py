@@ -18,18 +18,11 @@ async def on_ready():
     print(f'Connecté en tant que {bot.user} (ID : {bot.user.id})')
     print('------')
 
-@bot.command()
+@bot.command(help="Dire bonjour (c'est important d'être poli)")
 async def hello(ctx):
     await ctx.send(f'Salut {ctx.author.nick} !')
 
-@bot.command()
-async def help(ctx):
-    commandes = "!hello : dire bonjour (important d'être poli)\n"
-    commandes += "!membres : permet d'afficher les membres du serveur et leur nombre de challenges ratés\n"
-    commandes += "C'est tout ! (pour l'instant)"
-    await ctx.send(commandes)
-
-@bot.command()
+@bot.command(help="Permet d'afficher les membres du serveur et leur nombre de challenges ratés")
 async def membres(ctx):
     to_print = ""
     for membre in ctx.guild.members:
