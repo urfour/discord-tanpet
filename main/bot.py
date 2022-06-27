@@ -14,7 +14,7 @@ async def on_ready():
     print(f'Connecté en tant que {bot.user} (ID : {bot.user.id})')
     print('------')
 
-@bot.command
+@bot.command()
 async def hello(ctx):
     await ctx.send(f'Salut {ctx.author.name} !')
 
