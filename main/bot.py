@@ -36,7 +36,7 @@ async def on_ready():
 @bot.event
 async def on_member_join(member):
     if member.id not in bot.challs['ID']:
-        bot.challs.append({'DiscordID':member.id, 'Name':member.name, 'Challenges':0}, ignore_index=True)
+        bot.challs.append({'discordid':member.id, 'name':member.name, 'challenges':0}, ignore_index=True)
         print(f"Membre {member.name} (ID : {member.id} ajouté !")
 
 class ChallengesCog(commands.Cog, name='Challenges'):
@@ -55,7 +55,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
     async def initchalls(self, ctx):
         """ (Ré)Initialiser le compteur de challenges """
         members = [[member.id, member.name, 0] for member in ctx.guild.members if bot.user.id != member.id]
-        self.bot.challs = pd.DataFrame(members, columns=['DiscordID', 'Name', 'Challenges'])
+        self.bot.challs = pd.DataFrame(members, columns=['discordid', 'name', 'challenges'])
         self.bot.challs.to_sql('challenges', con=engine, if_exists='replace')
         print("Compteur (ré)initialisé")
         await ctx.send(f"{ctx.author.mention} Compteur (ré)initialisé, essayez d'être bons quand même")
@@ -74,7 +74,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         print(results)
         to_print = ""
         for _, row in results.iterrows():
-                to_print += f"{row['Name']} : {row['Challenges']} challenge(s) raté(s)\n"
+                to_print += f"{row['name']} : {row['challenges']} challenge(s) raté(s)\n"
         await ctx.send(to_print)
 
     @commands.command()
@@ -87,7 +87,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         cur = con.cursor()
         query = f"""SELECT * 
                     FROM challenges 
-                    WHERE challenges.DiscordID = {member.id}"""
+                    WHERE discordid = {member.id}"""
         results = pd.read_sql(query, con)
         await ctx.send(f"{member.name} a fait rater {results.iloc[0]['Challenges']} challenge(s) (le nullos)")
 
@@ -101,11 +101,11 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         cur = con.cursor()
         query = f"""SELECT * 
                     FROM challenges 
-                    WHERE DiscordID = {member.id}"""
+                    WHERE discordid = {member.id}"""
         challenges = pd.read_sql(query, con)
         query2 = f"""UPDATE challenges 
                     SET challenges.Challenges = {challenges.iloc[0]['Challenges']} 
-                    WHERE challenges.DiscordID = {member.id}"""
+                    WHERE discordid = {member.id}"""
         results = pd.read_sql(query2, con)
         print(results)
         await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
