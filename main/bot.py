@@ -85,8 +85,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = f"""SELECT * FROM challenges WHERE DiscordID = {member.id}"""
-        results = pd.read_sql(query, cur)
+        query = f"""SELECT * FROM challenges WHERE challenges.DiscordID = {member.id}"""
+        results = pd.read_sql(query, con)
         await ctx.send(f"{member.name} a fait rater {self.bot.challs.iloc[0]['Challenges']} challenge(s) (le nullos)")
 
     @commands.command()
@@ -97,9 +97,9 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = f"""SELECT * FROM challenges WHERE DiscordID = {member.id}"""
+        query = f"""SELECT * FROM challenges WHERE challenges.DiscordID = {member.id}"""
         challenges = pd.read_sql(query, con)
-        query2 = f"""UPDATE challenges SET Challenges = {challenges.iloc[0]['Challenges']} WHERE DiscordID = {member.id}"""
+        query2 = f"""UPDATE challenges SET challenges.Challenges = {challenges.iloc[0]['Challenges']} WHERE challenges.DiscordID = {member.id}"""
         results = pd.read_sql(query2, con)
         print(results)
         await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
