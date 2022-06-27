@@ -56,6 +56,7 @@ async def almanax(ctx):
     fp.close()
     offrande = offrande[15:-17]
     offrande += "\nhttps://www.krosmoz.com/fr/almanax"
+    await ctx.send(offrande)
 
 if __name__ == "__main__":
     bot.run(TOKEN)
