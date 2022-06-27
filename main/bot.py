@@ -102,12 +102,14 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = f"""SELECT * 
+        query = f"""SELECT challenges 
                     FROM challenges 
-                        """
+                    WHERE discordid = {member.id}"""
         challenges = pd.read_sql(query, con)
+        print("challenges")
+        print(challenges)
         query2 = f"""UPDATE challenges 
-                    SET challenges = {challenges.iloc[0]['challenges']} 
+                    SET challenges = {challenges.iloc[0] + 1} 
                     WHERE discordid = {member.id}"""
         results = pd.read_sql(query2, con)
         print(results)
