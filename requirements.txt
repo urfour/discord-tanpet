@@ -1,3 +1,5 @@
 discord
 python-dotenv
 pandas
+psycopg2
+sqlalchemy
