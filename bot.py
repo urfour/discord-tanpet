@@ -7,7 +7,7 @@ description = '''Bot de la guilde Tan pet de puicenss'''
 
 intents = discord.Intents.default()
 intents.members = True
-intents.message_content = True
+intents.messages = True
 
 bot = commands.Bot(command_prefix='!', description=description, intents=intents)
 
