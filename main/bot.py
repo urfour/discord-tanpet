@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import discord
 from discord.ext import commands
 
 load_dotenv()
@@ -7,7 +8,10 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 DESCRIPTION = '''Bot de la guilde Tan pet de puicenss'''
 
-bot = commands.Bot(command_prefix='!', description=DESCRIPTION)
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix='!', description=DESCRIPTION, intents=intents)
 
 @bot.event
 async def on_ready():
@@ -16,7 +20,7 @@ async def on_ready():
 
 @bot.command()
 async def hello(ctx):
-    await ctx.send(f'Salut {ctx.author.name} !')
+    await ctx.send(f'Salut {ctx.author.nick} !')
 
 @bot.command()
 async def membres(ctx):
