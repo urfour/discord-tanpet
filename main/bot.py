@@ -105,15 +105,12 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     FROM challenges 
                     WHERE discordid = {member.id}"""
         challenges = pd.read_sql(query, con)
-        print("challenges")
-        print(challenges)
         print("challenges loc : ")
-        print(challenges.iloc[0].values)
+        print((int(challenges.iloc[0].values[0]) + 1))
         query2 = f"""UPDATE challenges 
                     SET challenges = {(int(challenges.iloc[0].values[0]) + 1)} 
                     WHERE discordid = {member.id}"""
         results = pd.read_sql(query2, con)
-        print(results)
         await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
 
 class MiscCog(commands.Cog, name='Divers'):
