@@ -68,7 +68,6 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         query = f"""SELECT *
                     FROM challenges
                         """
-
         results = pd.read_sql(query, con)
         print("INFOALL")
         print(results)
@@ -106,6 +105,10 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     FROM challenges 
                     WHERE discordid = {member.id}"""
         challenges = pd.read_sql(query, con)
+        print("challenges")
+        print(challenges)
+        print("challenges loc : ")
+        print(challenges.iloc[0])
         query2 = f"""UPDATE challenges 
                     SET challenges = {(challenges.iloc[0].values[0] + 1)} 
                     WHERE discordid = {member.id}"""
