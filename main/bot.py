@@ -36,7 +36,7 @@ async def on_ready():
 @bot.event
 async def on_member_join(member):
     if member.id not in bot.challs['ID']:
-        bot.challs.append({'ID':member.id, 'Name':member.name, 'Challenges':0}, ignore_index=True)
+        bot.challs.append({'DiscordID':member.id, 'Name':member.name, 'Challenges':0}, ignore_index=True)
         print(f"Membre {member.name} (ID : {member.id} ajouté !")
 
 class ChallengesCog(commands.Cog, name='Challenges'):
@@ -85,7 +85,9 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = f"""SELECT * FROM challenges WHERE "challenges.DiscordID" = {member.id}"""
+        query = f"""SELECT * 
+                    FROM challenges 
+                    WHERE challenges.DiscordID = {member.id}"""
         results = pd.read_sql(query, con)
         await ctx.send(f"{member.name} a fait rater {results.iloc[0]['Challenges']} challenge(s) (le nullos)")
 
@@ -97,9 +99,13 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = f"""SELECT * FROM challenges WHERE "challenges.DiscordID" = {member.id}"""
+        query = f"""SELECT * 
+                    FROM challenges 
+                    WHERE DiscordID = {member.id}"""
         challenges = pd.read_sql(query, con)
-        query2 = f"""UPDATE challenges SET challenges.Challenges = {challenges.iloc[0]['Challenges']} WHERE "challenges.DiscordID" = {member.id}"""
+        query2 = f"""UPDATE challenges 
+                    SET challenges.Challenges = {challenges.iloc[0]['Challenges']} 
+                    WHERE challenges.DiscordID = {member.id}"""
         results = pd.read_sql(query2, con)
         print(results)
         await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
