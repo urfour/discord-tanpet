@@ -33,11 +33,6 @@ async def on_member_join(member):
         bot.challs.append({'ID':member.id, 'Name':member.name, 'Challenges':0}, ignore_index=True)
         print(f"Membre {member.name} (ID : {member.id} ajouté !")
 
-@bot.command()
-async def hello(ctx):
-    """ Dire bonjour (c'est important d'être poli) """
-    await ctx.send(f'Salut {ctx.author.mention} !')
-
 class ChallengesCog(commands.Cog, name='Challenges'):
     def __init__(self, bot):
         self.bot = bot
@@ -62,7 +57,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
     @commands.command()
     async def infoall(self, ctx):
-        """ Permet d'afficher les membres du serveur et leur nombre de challenges ratés """
+        """ Affiche les membres du serveur et leur nombre de challenges ratés """
         to_print = ""
         for membre in ctx.guild.members:
             if membre.id != self.bot.user.id:
@@ -71,7 +66,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
     @commands.command()
     async def info(self, ctx, member : discord.Member = None):
-        """ Permet d'afficher le nombre de challenges ratés d'un joueur spécifique """
+        """ Affiche le nombre de challenges ratés d'un joueur """
         if member is None:
             member = ctx.author
 
@@ -86,9 +81,14 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         self.bot.challs[self.bot.challs['ID'] == member.id]['Challenges'] += 1
         await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
 
-class DofusCog(commands.Cog, name='Informations diverses'):
+class MiscCog(commands.Cog, name='Diverses'):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command(brief="Dire bonjour (c'est important d'être poli)")
+    async def hello(ctx):
+        """ Dire bonjour (c'est important d'être poli) """
+        await ctx.send(f'Salut {ctx.author.mention} (ID : {ctx.author.id}) !')
     
     @commands.command()
     async def almanax(self, ctx):
@@ -115,5 +115,5 @@ class DofusCog(commands.Cog, name='Informations diverses'):
 
 if __name__ == "__main__":
     bot.add_cog(ChallengesCog(bot))
-    bot.add_cog(DofusCog(bot))
+    bot.add_cog(MiscCog(bot))
     bot.run(TOKEN)
