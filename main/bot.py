@@ -51,6 +51,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         members = [[member.id, member.name, 0] for member in ctx.guild.members]
         self.bot.challs = pd.DataFrame(members, columns=['ID', 'Name', 'Challenges'])
         self.bot.challs.to_csv('challs.csv')
+        print("Compteur initialisé")
         await ctx.send(f"{ctx.author.mention} Compteur initialisé, essayez d'être bons quand même")
 
     @commands.command()
@@ -59,7 +60,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         to_print = ""
         for membre in ctx.guild.members:
             if membre.id != self.bot.user.id:
-                to_print += membre.name + " : " + self.bot.challs[self.bot.challs['ID'] == membre.id]['Challenges'] + " challenge(s) raté(s).\n"
+                to_print += membre.name + " : " + self.bot.challs[self.bot.challs['ID'] == membre.id]['Challenges'][0] + " challenge(s) raté(s).\n"
         await ctx.send(to_print)
 
     @commands.command()
@@ -68,7 +69,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         if member is None:
             member = ctx.author
 
-        await ctx.send(f"{member.name} a fait rater {self.bot.challs[self.bot.challs['ID'] == member.id]['Challenges']} challenge(s) (le nullos)")
+        await ctx.send(f"{member.name} a fait rater {self.bot.challs[self.bot.challs['ID'] == member.id]['Challenges'][0]} challenge(s) (le nullos)")
 
     @commands.command()
     async def addchall(self, ctx, member : discord.Member = None):
