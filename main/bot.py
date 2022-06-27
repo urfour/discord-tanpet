@@ -54,7 +54,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
     @commands.has_role('BG suprême')
     async def initchalls(self, ctx):
         """ (Ré)Initialiser le compteur de challenges """
-        members = [[member.id, member.name, 0] for member in ctx.guild.members]
+        members = [[member.id, member.name, 0] for member in ctx.guild.members if bot.user.id != member.id]
         self.bot.challs = pd.DataFrame(members, columns=['DiscordID', 'Name', 'Challenges'])
         self.bot.challs.to_sql('challenges', con=engine, if_exists='replace')
         print("Compteur (ré)initialisé")
