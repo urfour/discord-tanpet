@@ -23,10 +23,18 @@ async def hello(ctx):
     await ctx.send(f'Salut {ctx.author.nick} !')
 
 @bot.command()
+async def help(ctx):
+    commandes = "!hello : dire bonjour (important d'être poli)\n"
+    commandes += "!membres : permet d'afficher les membres du serveur et leur nombre de challenges ratés\n"
+    commandes += "C'est tout ! (pour l'instant)"
+    await ctx.send(commandes)
+
+@bot.command()
 async def membres(ctx):
     to_print = ""
     for membre in ctx.guild.members:
-        to_print += membre.name + " : 0 challenge(s) raté(s).\n"
+        if membre.id != bot.user.id:
+            to_print += membre.name + " : 0 challenge(s) raté(s).\n"
     await ctx.send(to_print)
 
 if __name__ == "__main__":
