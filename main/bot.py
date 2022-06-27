@@ -31,14 +31,21 @@ async def on_ready():
     try:
         if engine.execute("SELECT * FROM challenges").fetchone() is not None:
             print(f'Base de données disponible !')
+            print('------')
     except psycopg2.errors.UndefinedTable:
-        print(f'Pas de fichier de challenges trouvé, merci de le générer !')
+        print("La base de données n'a pas été générée, merci de le faire !")
 
 @bot.event
 async def on_member_join(member):
-    if member.id not in bot.challs['ID']:
-        bot.challs.append({'discordid':member.id, 'name':member.name, 'challenges':0}, ignore_index=True)
-        print(f"Membre {member.name} (ID : {member.id} ajouté !")
+    con = psycopg2.connect(DATABASE_URL)
+    cur = con.cursor()
+    query = """ INSERT INTO challenges 
+                (discordid, name, challenges)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (discordid) DO NOTHING"""
+    cur.execute(query, (member.id, member.name, 0))
+    con.commit()
+    print(f"{member.name} a été ajouté à la base de données.")
 
 class ChallengesCog(commands.Cog, name='Challenges'):
     def __init__(self, bot):
@@ -62,12 +69,32 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         await ctx.send(f"{ctx.author.mention} Compteur (ré)initialisé, essayez d'être bons quand même")
 
     @commands.command()
+    @commands.has_role('BG suprême')
+    async def setchall(self, ctx, member : discord.Member = None, number : int = 0):
+        """ Définit le compteur de challenges ratés d'un joueur """
+        if member is None:
+            member = ctx.author
+
+        if number is None:
+            await ctx.send(f"La syntaxe de la commmande est incorrecte, merci de réessayer.")
+        else:
+            con = psycopg2.connect(DATABASE_URL)
+            cur = con.cursor()
+            query2 = """ UPDATE challenges 
+                        SET challenges = %s
+                        WHERE discordid = %s """
+            cur.execute(query2, (number, member.id))
+            con.commit()
+            await ctx.send(f"Le nombre de challenges ratés du joueur a été défini à {number}.")
+
+    @commands.command()
     async def infoall(self, ctx):
         """ Affiche les membres du serveur et leur nombre de challenges ratés """
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         query = f"""SELECT *
                     FROM challenges
+                    ORDER BY challenges DESC
                         """
         results = pd.read_sql(query, con)
         print("INFOALL")
@@ -95,6 +122,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             await ctx.send(f"{member.nick} a fait rater {results.iloc[0]['challenges']} challenge(s) (le nullos)")
 
     @commands.command()
+    @commands.has_role('BGs originels')
     async def addchall(self, ctx, member : discord.Member = None):
         """ Incrémente le compteur de challenges ratés (pas d'abus svp) """
         if member is None:
@@ -126,11 +154,9 @@ class MiscCog(commands.Cog, name='Divers'):
     @commands.command()
     async def almanax(self, ctx):
         """ Récupère l'Almanax du jour """
-        # Get today date
         today = datetime.date.today()
         date = today.strftime("%Y-%m-%d")
 
-        # Get corresponding Almanax
         almanax_url = "http://www.krosmoz.com/fr/almanax/" + date
         fp = urllib.request.urlopen(almanax_url)
         html = fp.read()
