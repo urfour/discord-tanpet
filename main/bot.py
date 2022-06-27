@@ -12,7 +12,8 @@ from discord.ext import commands
 
 load_dotenv()
 
-DATABASE_URL = os.environ["HEROKU_POSTGRESQL_CYAN_URL"].replace('postgres', 'postgresql')
+#DATABASE_URL = os.environ["HEROKU_POSTGRESQL_CYAN_URL"].replace('postgres', 'postgresql')
+DATABASE_URL = "postgresql://dlwbbulmokdaxx:9c47822c998bb74e46ffa352c1288df4590ea2adedbcefe00b9ff89d180a89db@ec2-176-34-215-248.eu-west-1.compute.amazonaws.com:5432/dfie8r0sjaunb9"
 TOKEN = os.getenv("DISCORD_TOKEN")
 DESCRIPTION = '''Bot de la guilde Tan pet de puicenss'''
 
@@ -101,17 +102,17 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = f"""SELECT challenges 
+        query = f""" SELECT challenges 
                     FROM challenges 
-                    WHERE discordid = {member.id}"""
+                    WHERE discordid = {member.id} """
         challenges = pd.read_sql(query, con)
-        print("challenges loc : ")
-        print((int(challenges.iloc[0].values[0]) + 1))
-        query2 = f"""UPDATE challenges 
-                    SET challenges = {(int(challenges.iloc[0].values[0]) + 1)} 
-                    WHERE discordid = {member.id}"""
-        results = pd.read_sql(query2, con)
-        await ctx.send(f"{ctx.author.mention} {self.messages[random.uniform(0, len(self.messages))]}")
+        chall_value = str(int(challenges.iloc[0].values[0]) + 1)
+        query2 = """ UPDATE challenges 
+                    SET challenges = %s
+                    WHERE discordid = %s """
+        cur.execute(query2, (chall_value, member.id))
+        con.commit()
+        await ctx.send(f"{ctx.author.mention} {self.messages[random.randint(0, len(self.messages))]}")
 
 class MiscCog(commands.Cog, name='Divers'):
     def __init__(self, bot):
