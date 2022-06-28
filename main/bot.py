@@ -86,8 +86,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         cur.execute(""" DROP TABLE IF EXISTS members """)
+        cur.commit()
         members = [[(i-1), member.id, member.name] for i, member in enumerate(ctx.guild.members) if bot.user.id != member.id]
-        print(members)
         self.bot.challs = pd.DataFrame(members, columns=['id', 'discordid', 'name'])
         self.bot.challs.to_sql('members', con=engine, index_label='id', if_exists='replace')
 
@@ -192,8 +192,6 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         else:
             if member is None:
                 member = ctx.author
-
-            
 
             con = psycopg2.connect(DATABASE_URL)
             cur = con.cursor()
