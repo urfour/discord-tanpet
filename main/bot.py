@@ -86,10 +86,16 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         cur.execute(""" DROP TABLE IF EXISTS members """)
+        cur.execute(""" CREATE TABLE challenges (
+                            id INT GENERATED ALWAYS AS IDENTITY,
+                            discordid INT,
+                            name VARCHAR(200),
+                            PRIMARY KEY (id, discordid)
+                        ) """)
         con.commit()
         members = [[member.id, member.name] for member in ctx.guild.members if bot.user.id != member.id]
         self.bot.challs = pd.DataFrame(members, columns=['discordid', 'name'])
-        self.bot.challs.to_sql('members', con=engine, if_exists='replace')
+        self.bot.challs.to_sql('members', con=engine, if_exists='append')
 
         query = """ DROP TABLE IF EXISTS challenges """
         cur.execute(query)
