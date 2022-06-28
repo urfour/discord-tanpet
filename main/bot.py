@@ -55,9 +55,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
     @commands.command()
     @commands.has_role('BG suprême')
-    async def add_chall_references(self, ctx):
-        """ Ajouter les noms des différents challenges dans la base de données """
-
+    async def setup(self, ctx):
+        """ (Ré)Initialiser le compteur de challenges """
         url = 'https://tofus.fr/fiches/challenge.php'
         challenges_page = requests.get(url)
         soup = BeautifulSoup(challenges_page.text, 'html.parser')
@@ -69,39 +68,40 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         for row in challenges:
             tr = row.find_all('td')
-            challenges_dict.append(
-                {'name': tr[0].get_text(),
-                'description': tr[1].get_text()
-                }
-            )
-        df = pd.DataFrame.from_dict(challenges_dict)
-        df.to_sql('challenges_reference', con=engine, if_exists='replace')
-        await ctx.send(f"{ctx.author.mention} Les challenges ont bien été ajoutés dans la base de données !")
-
-    @commands.command()
-    @commands.has_role('BG suprême')
-    async def init_challs(self, ctx):
-        """ (Ré)Initialiser le compteur de challenges """
+            challenges_dict.append((tr[0].get_text(), tr[1].get_text()))
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        cur.execute(""" DROP TABLE IF EXISTS members """)
-        cur.execute(""" CREATE TABLE membres (
-                            id INT GENERATED ALWAYS AS IDENTITY,
-                            discordid INT,
-                            name VARCHAR(200),
+        cur.execute(""" DROP TABLE IF EXISTS challenges_reference CASCADE """)
+        cur.execute(""" CREATE TABLE challenges_reference (
+                            id SERIAL NOT NULL PRIMARY KEY,
+                            name VARCHAR(50),
+                            description VARCHAR(300)
+                        ) """)
+        query = """ INSERT INTO challenges_reference(name, description)
+                        VALUES (%s, %s) """
+        cur.executemany(query, challenges_dict)
+        con.commit()
+        await ctx.send(f"{ctx.author.mention} Les challenges ont bien été ajoutés dans la base de données !")
+
+        cur.execute(""" DROP TABLE IF EXISTS members CASCADE """)
+        cur.execute(""" CREATE TABLE members (
+                            id SERIAL NOT NULL ,
+                            discordid VARCHAR(100) NOT NULL UNIQUE,
+                            name VARCHAR(100),
                             PRIMARY KEY (id, discordid)
                         ) """)
         con.commit()
-        members = [[member.id, member.name] for member in ctx.guild.members if bot.user.id != member.id]
-        self.bot.challs = pd.DataFrame(members, columns=['discordid', 'name'])
-        self.bot.challs.to_sql('members', con=engine, if_exists='append')
+        members = [(member.id, member.name) for member in ctx.guild.members if bot.user.id != member.id]
+        query = """ INSERT INTO members(discordid, name)
+                    VALUES(%s, %s) """
+        cur.executemany(query, members)
 
         query = """ DROP TABLE IF EXISTS challenges """
         cur.execute(query)
         query2 = """ CREATE TABLE challenges (
-                    id INT GENERATED ALWAYS AS IDENTITY,
-                    discordid INT,
+                    id SERIAL NOT NULL,
+                    discordid VARCHAR(100),
                     challengeid INT,
                     PRIMARY KEY(id),
                     CONSTRAINT fk_discordid
@@ -109,13 +109,13 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                             REFERENCES members(discordid),
                     CONSTRAINT fk_challengeid
                         FOREIGN KEY(challengeid)
-                            REFERENCES challenges_references(id) 
+                            REFERENCES challenges_reference(id) 
                     ) """
         cur.execute(query2)
         con.commit()        
 
-        print("Compteur (ré)initialisé")
-        await ctx.send(f"{ctx.author.mention} Compteur (ré)initialisé, essayez d'être bons quand même")
+        print("Tables (ré)initialisées")
+        await ctx.send(f"{ctx.author.mention} Tout est prêt, essayez d'être bons quand même")
 
     @commands.command()
     @commands.has_role('BG suprême')
@@ -127,48 +127,72 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         else:
             con = psycopg2.connect(DATABASE_URL)
             cur = con.cursor()
-            query2 = f""" SELECT id
-                        FROM challenges_references
-                        WHERE name LIKE {challenge} """
-            cur.execute(query2)
+            query2 = """ SELECT id
+                        FROM challenges_reference
+                        WHERE UPPER(name) LIKE UPPER(%s) """
+            cur.execute(query2, (challenge,))
             con.commit()
-            print(cur)
-            #await ctx.send(f"Le nombre de challenges ratés du joueur a été défini à {number}.")
+            row = cur.fetchone()
+            if row is None:
+                await ctx.send("Ce challenge n'existe pas.")
+            else:
+                await ctx.send(row[0])
 
     @commands.command()
     async def challs(self, ctx):
         """ Affiche tous les challenges existants """
+        user = await self.bot.fetch_user(ctx.author.id)
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         query = """ SELECT *
-                    FROM challenges_references """
+                    FROM challenges_reference """
         cur.execute(query)
-        print(cur)
+        con.commit()
+
+        challs = cur.fetchall()
 
         to_print = ""
-        for l in cur:
-            to_print += f"{cur[1]} : {cur[2]}\n"
-        
-        con.commit()
-        await ctx.send(to_print)
+        for l in challs:
+            to_print += f"{l[1]} : {l[2]}\n"
+
+        if len(to_print) <= 2000:
+            await user.send(to_print)
+        else:
+            lines = to_print.splitlines()
+            new_message = ""
+            message_list = []
+            for line in lines:
+                if len(new_message+line+"\n") <= 2000:
+                    new_message += line+"\n"
+                else:
+                    message_list.append(new_message)
+                    new_message = ""
+            if new_message:
+                message_list.append(new_message)
+            for msg in message_list:
+                await user.send(msg)
 
     @commands.command()
     async def info_all(self, ctx):
-        """ Affiche les membres du serveur et leur nombre de challenges ratés """
+        """ Affiche le nombre de challenges ratés de tout le monde """
 
         con = psycopg2.connect(DATABASE_URL)
-        query = f"""SELECT *
-                    FROM members
-                    ORDER BY name ASC
-                        """
-        results = pd.read_sql(query, con)
-        print("INFOALL")
-        print(results)
-        to_print = ""
-        for _, row in results.iterrows():
-                to_print += f"{row['name']}\n"
-        await ctx.send(to_print)
+        cur = con.cursor()
+        query = f"""SELECT name, COUNT(*)
+                    FROM challenges, members
+                    WHERE challenges.discordid = members.discordid
+                    GROUP BY name
+                    ORDER BY 2 DESC, name ASC """
+        cur.execute(query)
+        challs = cur.fetchall()
+        if len(challs) == 0:
+            await ctx.send("Félicitations, personne n'a raté de challenge :sunglasses: (pour l'instant...)")
+        else:
+            to_print = ""
+            for row in challs:
+                    to_print += f"{row[0]} : {row[1]} challenge(s) raté(s)\n"
+            await ctx.send(to_print)
 
     @commands.command()
     async def info(self, ctx, member : discord.Member = None):
@@ -179,39 +203,50 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = f"""SELECT * 
-                    FROM members 
-                    WHERE discordid = {member.id}"""
-        results = pd.read_sql(query, con)
-        if results.iloc[0]['challenges'] == 0:
+        query = f"""SELECT name, COUNT(*) 
+                    FROM challenges, challenges_reference
+                    WHERE discordid = '{member.id}'
+                    AND challenges.challengeid = challenges_reference.id
+                    GROUP BY name """
+        cur.execute(query)
+        challs = cur.fetchall()
+        challenges_count = 0
+        to_print = ""
+        if len(challs) == 0:
             await ctx.send(f"{member.nick} n'a fait rater **aucun** challenge (quel bg !)")
         else:
-            await ctx.send(f"{member.nick} a fait rater {results.iloc[0]['challenges']} challenge(s) (le nullos)")
+            for chall in challs:
+                to_print += f"- **{chall[1]}** fois le challenge **{chall[0]}**\n"
+                challenges_count += chall[1]
+            to_print = f"{member.nick} a fait rater **{challenges_count}** challenge(s) :\n" + to_print
+            await ctx.send(to_print)
 
     @commands.command()
-    @commands.has_role('BGs originels')
+    @commands.has_any_role('BG suprême', 'BGs originels')
     async def add_chall(self, ctx, member : discord.Member = None, challenge : str = None):
-        """ Incrémente le compteur de challenges ratés (pas d'abus svp) """
-    
-        if challenge is None:
-            await ctx.send("Je n'ai pas compris quel est le challenge qui a été échoué, merci de réessayer.")
-        else:
-            if member is None:
-                member = ctx.author
+        """ Ajoute un challenge raté (pas d'abus svp) """
 
-            con = psycopg2.connect(DATABASE_URL)
-            cur = con.cursor()
-            query = f""" SELECT challenges 
-                        FROM members 
-                        WHERE discordid = {member.id} """
-            challenges = pd.read_sql(query, con)
-            chall_value = str(int(challenges.iloc[0].values[0]) + 1)
-            query2 = """ UPDATE members 
-                        SET challenges = %s
-                        WHERE discordid = %s """
-            cur.execute(query2, (chall_value, member.id))
+        if member is None:
+            member = ctx.author
+
+        con = psycopg2.connect(DATABASE_URL)
+        cur = con.cursor()
+        query2 = """ SELECT id
+                    FROM challenges_reference
+                    WHERE UPPER(name) LIKE UPPER(%s) """
+        cur.execute(query2, (challenge,))
+        con.commit()
+        row = cur.fetchone()
+        if row is None:
+            await ctx.send("Ce challenge n'existe pas, ou celui-ci n'a pas été renseigné.")
+        else:
+            challenge_id = row[0]
+            
+            query = """ INSERT INTO challenges(discordid, challengeid)
+                        VALUES (%s, %s)"""
+            cur.execute(query, (str(member.id), challenge_id))
             con.commit()
-            await ctx.send(f"{ctx.author.mention} {self.messages[random.randint(0, len(self.messages))]}")
+            await ctx.send(f"{ctx.author.mention} {random.choice(self.messages)}")
 
 class MiscCog(commands.Cog, name='Divers'):
     def __init__(self, bot):
