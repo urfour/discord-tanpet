@@ -145,6 +145,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
+<<<<<<< HEAD
         query = """ SELECT *
                     FROM challenges_reference """
         cur.execute(query)
@@ -152,6 +153,15 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         challs = cur.fetchall()
 
+=======
+        query = f"""SELECT *
+                    FROM challenges
+                    ORDER BY challenges DESC
+                        """
+        results = pd.read_sql(query, con)
+        print("INFOALL")
+        print(results)
+>>>>>>> parent of e5b3600 (Revert "Revert "challenges ratés par ordre croissant de nom"")
         to_print = ""
         for l in challs:
             to_print += f"{l[1]} : {l[2]}\n"
