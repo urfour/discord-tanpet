@@ -86,7 +86,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         cur.execute(""" DROP TABLE IF EXISTS members """)
-        cur.execute(""" CREATE TABLE challenges (
+        cur.execute(""" CREATE TABLE membres (
                             id INT GENERATED ALWAYS AS IDENTITY,
                             discordid INT,
                             name VARCHAR(200),
