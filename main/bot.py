@@ -89,9 +89,9 @@ class ChallengesCog(commands.Cog, name='Challenges'):
     async def initchalls(self, ctx):
         """ (Ré)Initialiser le compteur de challenges """
 
-        members = [[member.id, member.name] for member in ctx.guild.members if bot.user.id != member.id]
-        self.bot.challs = pd.DataFrame(members, columns=['discordid', 'name'])
-        self.bot.challs.to_sql('members', con=engine, if_exists='replace')
+        members = [[(i-1), member.id, member.name] for i, member in enumerate(ctx.guild.members) if bot.user.id != member.id]
+        self.bot.challs = pd.DataFrame(members, columns=['id', 'discordid', 'name'])
+        self.bot.challs.to_sql('members', con=engine, index_label='id', if_exists='replace')
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
@@ -106,7 +106,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                         FOREIGN KEY(discordid)
                             REFERENCES members(discordid),
                     CONSTRAINT fk_challengeid
-                        FOREIGN KEY(discordid)
+                        FOREIGN KEY(challengeid)
                             REFERENCES challenges_references(id) 
                     ) """
         cur.execute(query2)
@@ -118,7 +118,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
     @commands.command()
     @commands.has_role('BG suprême')
     async def get_chall_id(self, ctx, challenge : str):
-        """ Définit le compteur de challenges ratés d'un joueur """
+        """ Récupère l'id d'un challenge """
 
         if challenge is None:
             await ctx.send(f"La syntaxe de la commmande est incorrecte, merci de réessayer.")
@@ -128,7 +128,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             query2 = """ SELECT id
                         FROM challenges_references
                         WHERE name LIKE %s """
-            cur.execute(query2, challenge)
+            cur.execute(query2, (challenge))
             con.commit()
             print(cur)
             #await ctx.send(f"Le nombre de challenges ratés du joueur a été défini à {number}.")

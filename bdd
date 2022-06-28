@@ -1,6 +1,0 @@
-TABLE MEMBERS
-id  discordid   name    challenges
-
-
-TABLE CHALLENGES
-id  discordid   challengeid     
