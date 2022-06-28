@@ -203,11 +203,12 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = f"""SELECT name, COUNT(*) 
+        query = f""" SELECT name, COUNT(*) 
                     FROM challenges, challenges_reference
                     WHERE discordid = '{member.id}'
                     AND challenges.challengeid = challenges_reference.id
-                    GROUP BY name """
+                    GROUP BY name 
+                    ORDER BY 2 DESC, name ASC """
         cur.execute(query)
         challs = cur.fetchall()
         challenges_count = 0
