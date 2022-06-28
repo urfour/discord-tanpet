@@ -88,7 +88,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
     @commands.command()
     @commands.has_role('BG suprême')
-    async def initchalls(self, ctx):
+    async def init_challs(self, ctx):
         """ (Ré)Initialiser le compteur de challenges """
 
         con = psycopg2.connect(DATABASE_URL)
