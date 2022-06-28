@@ -89,11 +89,12 @@ class ChallengesCog(commands.Cog, name='Challenges'):
     async def initchalls(self, ctx):
         """ (Ré)Initialiser le compteur de challenges """
 
+        con = psycopg2.connect(DATABASE_URL)
+        con.execute(""" DROP TABLE IF EXISTS members """)
         members = [[(i-1), member.id, member.name] for i, member in enumerate(ctx.guild.members) if bot.user.id != member.id]
         self.bot.challs = pd.DataFrame(members, columns=['id', 'discordid', 'name'])
         self.bot.challs.to_sql('members', con=engine, index_label='id', if_exists='replace')
 
-        con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         query = """ DROP TABLE IF EXISTS challenges """
         cur.execute(query)
@@ -132,6 +133,24 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             con.commit()
             print(cur)
             #await ctx.send(f"Le nombre de challenges ratés du joueur a été défini à {number}.")
+
+    @commands.command()
+    async def challs(self, ctx):
+        """ Affiche tous les challenges existants """
+
+        con = psycopg2.connect(DATABASE_URL)
+        cur = con.cursor()
+        query = """ SELECT *
+                    FROM challenges_references """
+        cur.execute(query)
+        print(cur)
+
+        to_print = ""
+        for l in cur:
+            to_print += f"{cur[1]} : {cur[2]}\n"
+        
+        con.commit()
+        await ctx.send(to_print)
 
     @commands.command()
     async def info_all(self, ctx):
