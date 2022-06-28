@@ -87,7 +87,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         cur = con.cursor()
         cur.execute(""" DROP TABLE IF EXISTS members """)
         con.commit()
-        members = [[(i-1), member.id, member.name] for i, member in enumerate(ctx.guild.members) if bot.user.id != member.id]
+        members = [[member.id, member.name] for member in ctx.guild.members if bot.user.id != member.id]
         self.bot.challs = pd.DataFrame(members, columns=['discordid', 'name'])
         self.bot.challs.to_sql('members', con=engine, if_exists='replace')
 
