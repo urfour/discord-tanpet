@@ -29,12 +29,14 @@ bot = commands.Bot(command_prefix='!', description=DESCRIPTION, intents=intents)
 async def on_ready():
     print(f'Connecté en tant que {bot.user} (ID : {bot.user.id})')
     print('------')
-    try:
-        if engine.execute("SELECT * FROM members").fetchone() is not None:
-            print(f'Base de données disponible !')
-            print('------')
-    except psycopg2.errors.UndefinedTable:
-        print("La base de données n'a pas été générée, merci de le faire !")
+    con = psycopg2.connect(DATABASE_URL)
+    cur = con.cursor()
+    cur.execute("select * from information_schema.tables where table_name=%s", ('members',))
+    if bool(cur.rowcount):
+        print("Base de données disponible !")
+    else:
+        print("Tables non générées, merci de le faire")
+        print('------')
 
 @bot.event
 async def on_member_join(member):
@@ -159,14 +161,14 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         con = psycopg2.connect(DATABASE_URL)
         query = f"""SELECT *
                     FROM members
-                    ORDER BY challenges DESC, name ASC
+                    ORDER BY name ASC
                         """
         results = pd.read_sql(query, con)
         print("INFOALL")
         print(results)
         to_print = ""
         for _, row in results.iterrows():
-                to_print += f"{row['name']} : {row['challenges']} challenge(s) raté(s)\n"
+                to_print += f"{row['name']}\n"
         await ctx.send(to_print)
 
     @commands.command()
