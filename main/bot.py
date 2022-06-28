@@ -94,11 +94,9 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         cur = con.cursor()
         query = f"""SELECT *
                     FROM challenges
-                    ORDER BY challenges DESC
+                    ORDER BY challenges DESC, name ASC
                         """
         results = pd.read_sql(query, con)
-        print("INFOALL")
-        print(results)
         to_print = ""
         for _, row in results.iterrows():
                 to_print += f"{row['name']} : {row['challenges']} challenge(s) raté(s)\n"
