@@ -90,12 +90,12 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         """ (Ré)Initialiser le compteur de challenges """
 
         con = psycopg2.connect(DATABASE_URL)
-        con.execute(""" DROP TABLE IF EXISTS members """)
+        cur = con.cursor()
+        cur.execute(""" DROP TABLE IF EXISTS members """)
         members = [[(i-1), member.id, member.name] for i, member in enumerate(ctx.guild.members) if bot.user.id != member.id]
         self.bot.challs = pd.DataFrame(members, columns=['id', 'discordid', 'name'])
         self.bot.challs.to_sql('members', con=engine, index_label='id', if_exists='replace')
 
-        cur = con.cursor()
         query = """ DROP TABLE IF EXISTS challenges """
         cur.execute(query)
         query2 = """ CREATE TABLE challenges (
