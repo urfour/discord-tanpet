@@ -125,40 +125,19 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         else:
             con = psycopg2.connect(DATABASE_URL)
             cur = con.cursor()
-            query2 = """ SELECT id
+            query2 = f""" SELECT id
                         FROM challenges_references
-                        WHERE name LIKE %s """
-            cur.execute(query2, (challenge))
+                        WHERE name LIKE {challenge} """
+            cur.execute(query2)
             con.commit()
             print(cur)
             #await ctx.send(f"Le nombre de challenges ratés du joueur a été défini à {number}.")
-
-    @commands.command()
-    @commands.has_role('BG suprême')
-    async def set_chall(self, ctx, member : discord.Member = None, number : int = 0):
-        """ Définit le compteur de challenges ratés d'un joueur """
-
-        if member is None:
-            member = ctx.author
-
-        if number is None:
-            await ctx.send(f"La syntaxe de la commmande est incorrecte, merci de réessayer.")
-        else:
-            con = psycopg2.connect(DATABASE_URL)
-            cur = con.cursor()
-            query2 = """ UPDATE members 
-                        SET challenges = %s
-                        WHERE discordid = %s """
-            cur.execute(query2, (number, member.id))
-            con.commit()
-            await ctx.send(f"Le nombre de challenges ratés du joueur a été défini à {number}.")
 
     @commands.command()
     async def info_all(self, ctx):
         """ Affiche les membres du serveur et leur nombre de challenges ratés """
 
         con = psycopg2.connect(DATABASE_URL)
-        cur = con.cursor()
         query = f"""SELECT *
                     FROM members
                     ORDER BY challenges DESC, name ASC
