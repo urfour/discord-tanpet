@@ -29,14 +29,6 @@ bot = commands.Bot(command_prefix='!', description=DESCRIPTION, intents=intents)
 async def on_ready():
     print(f'Connecté en tant que {bot.user} (ID : {bot.user.id})')
     print('------')
-    con = psycopg2.connect(DATABASE_URL)
-    cur = con.cursor()
-    cur.execute("select * from information_schema.tables where table_name=%s", ('members',))
-    if bool(cur.rowcount):
-        print("Base de données disponible !")
-    else:
-        print("Tables non générées, merci de le faire")
-        print('------')
 
 @bot.event
 async def on_member_join(member):
