@@ -12,8 +12,7 @@ from discord.ext import commands
 
 load_dotenv()
 
-#DATABASE_URL = os.environ["HEROKU_POSTGRESQL_CYAN_URL"].replace('postgres', 'postgresql')
-DATABASE_URL = "postgresql://dlwbbulmokdaxx:9c47822c998bb74e46ffa352c1288df4590ea2adedbcefe00b9ff89d180a89db@ec2-176-34-215-248.eu-west-1.compute.amazonaws.com:5432/dfie8r0sjaunb9"
+DATABASE_URL = os.environ["HEROKU_POSTGRESQL_CYAN_URL"].replace('postgres', 'postgresql')
 TOKEN = os.getenv("DISCORD_TOKEN")
 DESCRIPTION = '''Bot de la guilde Tan pet de puicenss'''
 
