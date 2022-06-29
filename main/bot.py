@@ -61,7 +61,7 @@ async def on_member_join(member):
     con.commit()
     print(f"{member.name} a été ajouté à la base de données.")
 
-class Help(commands.Cog):
+class Help(commands.Cog, name='Aide'):
     """
     Envoie ce message d'aide
     """
@@ -278,27 +278,13 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         con.commit()
 
         challs = cur.fetchall()
+        embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange)
+        embed.set_thumbnail('https://img2.freepng.fr/20180809/kq/kisspng-dofus-touch-wakfu-dofus-pogo-dofus-pets-dofus-2-25-1-9-112-3-free-download-for-mac-macupda-5b6cbb6f4557d8.3394001615338525272841.jpg')
 
-        to_print = ""
         for l in challs:
-            to_print += f"{l[1]} : {l[2]}\n"
+            embed.add_field(name=l[1], value=l[2], inline=False)
 
-        if len(to_print) <= 2000:
-            await user.send(to_print)
-        else:
-            lines = to_print.splitlines()
-            new_message = ""
-            message_list = []
-            for line in lines:
-                if len(new_message+line+"\n") <= 2000:
-                    new_message += line+"\n"
-                else:
-                    message_list.append(new_message)
-                    new_message = ""
-            if new_message:
-                message_list.append(new_message)
-            for msg in message_list:
-                await user.send(msg)
+        await user.send(embed)
 
     @commands.command()
     async def info_all(self, ctx):
@@ -377,7 +363,9 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             await ctx.send(f"{ctx.author.mention} {random.choice(self.messages)}")
 
 class MiscCog(commands.Cog, name='Divers'):
-    """ Commandes diverses """
+    """ 
+    Commandes diverses 
+    """
     def __init__(self, bot):
         self.bot = bot
 
