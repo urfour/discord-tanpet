@@ -275,8 +275,6 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange())
         embed.set_thumbnail(url=f'https://image.over-blog.com/5ZW7J-uV9A9TuPXKCO3m2LPf7VE=/filters:no_upscale()/image%2F1215535%2F20211125%2Fob_475eb1_cheat-des-devs.png')
 
-        print(challs)
-
         for l in challs:
             embed.add_field(name=l[1], value=l[2], inline=False)
 
@@ -343,7 +341,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         cur = con.cursor()
         query2 = """ SELECT id
                     FROM challenges_reference
-                    WHERE UPPER(name) LIKE UPPER(%s) """
+                    WHERE UPPER(name) LIKE UPPER(%s%) """
         cur.execute(query2, (challenge,))
         con.commit()
         row = cur.fetchone()
