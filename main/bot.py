@@ -63,7 +63,7 @@ async def on_member_join(member):
 
 class Help(commands.Cog):
     """
-    Sends this help message
+    Envoie ce message d'aide
     """
 
     def __init__(self, bot):
@@ -72,7 +72,7 @@ class Help(commands.Cog):
     @commands.command()
     # @commands.bot_has_permissions(add_reactions=True,embed_links=True)
     async def help(self, ctx, *input):
-        """Shows all modules of that bot"""
+        """Affiche tous les modules"""
 	
 	# !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
         prefix = '!'
@@ -167,6 +167,9 @@ class Help(commands.Cog):
         await send_embed(ctx, emb)
 
 class ChallengesCog(commands.Cog, name='Challenges'):
+    """
+    Informations concernant les challenges échoués
+    """
     def __init__(self, bot):
         self.bot = bot
         self.messages = [
@@ -374,6 +377,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             await ctx.send(f"{ctx.author.mention} {random.choice(self.messages)}")
 
 class MiscCog(commands.Cog, name='Divers'):
+    """ Commandes diverses """
     def __init__(self, bot):
         self.bot = bot
 
