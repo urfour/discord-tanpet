@@ -279,7 +279,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         challs = cur.fetchall()
         embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange())
-        embed.set_thumbnail(url=f'https://image.over-blog.com/n6xqLeMcXq6r_V9ubQjR5hFuXJA=/filters:no_upscale()/image%2F1215535%2F20211125%2Fob_bd65b7_challenge-zombie.png')
+        embed.set_thumbnail(url=f'https://image.over-blog.com/5ZW7J-uV9A9TuPXKCO3m2LPf7VE=/filters:no_upscale()/image%2F1215535%2F20211125%2Fob_475eb1_cheat-des-devs.png')
 
         for l in challs:
             embed.add_field(name=l[1], value=l[2], inline=False)
