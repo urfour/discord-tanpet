@@ -406,6 +406,7 @@ class MiscCog(commands.Cog, name='Divers'):
         await ctx.send(offrande)
 
 if __name__ == "__main__":
+    bot.remove_command('help')
     bot.add_cog(ChallengesCog(bot))
     bot.add_cog(MiscCog(bot))
     bot.add_cog(Help(bot))
