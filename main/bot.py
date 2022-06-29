@@ -189,7 +189,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         for row in challenges:
             tr = row.find_all('td')
-            challenges_dict.append((tr[0].get_text(), tr[1].get_text()))
+            challenges_dict.append((tr[0].get_text().strip(), tr[1].get_text().strip()))
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
@@ -341,7 +341,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         cur = con.cursor()
         query2 = """ SELECT id
                     FROM challenges_reference
-                    WHERE UPPER(name) LIKE UPPER(%s%) """
+                    WHERE UPPER(name) LIKE UPPER(%s) """
         cur.execute(query2, (challenge,))
         con.commit()
         row = cur.fetchone()
