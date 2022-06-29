@@ -275,6 +275,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange())
         embed.set_thumbnail(url=f'https://image.over-blog.com/5ZW7J-uV9A9TuPXKCO3m2LPf7VE=/filters:no_upscale()/image%2F1215535%2F20211125%2Fob_475eb1_cheat-des-devs.png')
 
+        print(challs)
+
         for l in challs:
             embed.add_field(name=l[1], value=l[2], inline=False)
 
@@ -354,7 +356,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                         VALUES (%s, %s)"""
             cur.execute(query, (str(member.id), challenge_id))
             con.commit()
-            await ctx.send(f"{ctx.author.mention} {random.choice(self.messages)}")
+            await ctx.send(f"{ctx.member.mention} {random.choice(self.messages)}")
 
 class MiscCog(commands.Cog, name='Divers'):
     """ 
