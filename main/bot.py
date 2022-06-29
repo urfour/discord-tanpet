@@ -354,7 +354,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                         VALUES (%s, %s)"""
             cur.execute(query, (str(member.id), challenge_id))
             con.commit()
-            await ctx.send(f"{ctx.member.mention} {random.choice(self.messages)}")
+            await ctx.send(f"{member.mention} {random.choice(self.messages)}")
 
 class MiscCog(commands.Cog, name='Divers'):
     """ 
