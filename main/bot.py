@@ -284,7 +284,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         for l in challs:
             embed.add_field(name=l[1], value=l[2], inline=False)
 
-        await user.send(embed)
+        await user.send(embed=embed)
 
     @commands.command()
     async def info_all(self, ctx):
