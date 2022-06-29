@@ -1,11 +1,12 @@
 import os
-import urllib.request
 import datetime
 import discord
 import random
-import pandas as pd
 import requests
 import psycopg2
+import locale
+
+locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
 
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
