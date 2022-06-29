@@ -389,7 +389,7 @@ class MiscCog(commands.Cog, name='Divers'):
         div = soup.find('div', {'class': 'more-infos-content'})
         
         embed = discord.Embed(
-            title=f'Almanax du {today.stftime("%A %w %B %Y")}', 
+            title=f'Almanax du {today.strftime("%A %w %B %Y")}', 
             color=discord.Color.purple(),
             url=almanax_url
         )
