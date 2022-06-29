@@ -383,19 +383,20 @@ class MiscCog(commands.Cog, name='Divers'):
         date = today.strftime("%Y-%m-%d")
 
         almanax_url = "http://www.krosmoz.com/fr/almanax/" + date
-        fp = urllib.request.urlopen(almanax_url)
-        html = fp.read()
-        text = html.decode("utf8")
-        fp.close()
-        for line in text.split('\n'):
-            if 'Récupérer' in line:
-                offrande = line
-                break
+        page = requests.get(almanax_url).text
+        soup = BeautifulSoup(page, 'html.parser')
 
-        fp.close()
-        offrande = offrande[15:-17]
-        offrande += "\nhttps://www.krosmoz.com/fr/almanax"
-        await ctx.send(offrande)
+        div = soup.find('div', {'class': 'more-infos-content'})
+        
+        embed = discord.Embed(
+            title=f'Almanax du {today.stftime("%A %w %B %Y")}', 
+            color=discord.Color.purple(),
+            url=almanax_url
+        )
+        embed.set_thumbnail(url=div.find('img')['src'])
+        embed.add_field(name='Ressource', value=div.find('p').getText().strip())
+
+        await send_embed(ctx, embed)
 
 if __name__ == "__main__":
     bot.remove_command('help')
