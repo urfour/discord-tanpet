@@ -392,11 +392,16 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             if len(challs) == 0:
                 await ctx.send("Le challenge n'a pas été raté pour l'instant :sunglasses:")
             else:
+                cur.execute(""" SELECT image
+                                FROM challenges_reference
+                                WHERE UPPER(challenges_reference.name) LIKE UPPER(%s) """)
+                image = cur.fetchone()
                 embed = discord.Embed(
                     title=challenge,
                     description='Nombre de challenges ratés :',
                     color=discord.Color.gold(),
                 )
+                embed.set_thumbnail(image[0])
                 for chall in challs:
                     embed.add_field(name=chall[0], value=f'{chall[1]} fois')
                 await send_embed(ctx, embed)                
