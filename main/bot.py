@@ -337,10 +337,11 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         else:
             con = psycopg2.connect(DATABASE_URL)
             cur = con.cursor()
-            query = f""" SELECT *
-                        FROM challenges, challenges_reference
-                        WHERE challenges_reference.name = challenge
+            query = f""" SELECT name, COUNT(*)
+                        FROM challenges, challenges_reference, members
+                        WHERE challenges_reference.name = {challenge}
                         AND challenges.challengeid = challenges_reference.id
+                        AND members.discordid = challenges.discordid
                         GROUP BY name 
                         ORDER BY 2 DESC, name ASC """
             cur.execute(query)
