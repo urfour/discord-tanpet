@@ -56,6 +56,11 @@ async def on_member_join(member):
         con.commit()
         print(f"{member.name} a été ajouté à la base de données.")
 
+@test.error
+async def test_error(ctx, error):
+    if isinstance(error, commands.MemberNotFound):
+        await ctx.send("Le membre en question n'existe pas.")
+
 class Help(commands.Cog, name='Aide'):
     """
     Envoie ce message d'aide
@@ -455,7 +460,6 @@ class MiscCog(commands.Cog, name='Divers'):
                 query = f""" DELETE FROM members
                             WHERE discordid = '{member.id}' """
                 cur.execute(query)
-                print(cur.fetchone())
             con.commit()
             print("Les bots ont bien été supprimés")
 
