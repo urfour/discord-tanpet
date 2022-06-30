@@ -394,7 +394,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             else:
                 cur.execute(""" SELECT image
                                 FROM challenges_reference
-                                WHERE UPPER(challenges_reference.name) LIKE UPPER(%s) """)
+                                WHERE UPPER(challenges_reference.name) LIKE UPPER(%s) """, (challenge,))
                 image = cur.fetchone()
                 embed = discord.Embed(
                     title=challenge,
