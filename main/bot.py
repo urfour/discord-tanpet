@@ -204,8 +204,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                             description VARCHAR(300),
                             image VARCHAR(100)
                         ) """)
-        query = """ INSERT INTO challenges_reference(name, description)
-                        VALUES (%s, %s) """
+        query = """ INSERT INTO challenges_reference(name, description, image)
+                        VALUES (%s, %s, %s) """
         cur.executemany(query, challenges_dict)
         con.commit()
         await ctx.send(f"{ctx.author.mention} Les challenges ont bien été ajoutés dans la base de données !")
