@@ -172,6 +172,43 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             "Allez, encore un pour la route...",
             "On s'amuse avec toi décidément !"
         ]
+    
+    @commands.command()
+    @commands.has_role('BG suprême')
+    async def reset_challs_ref(self, ctx):
+        """ (Ré)Initialiser la table de référence des challenges """
+        url = 'https://tofus.fr/fiches/challenge.php'
+        challenges_page = requests.get(url)
+        soup = BeautifulSoup(challenges_page.text, 'html.parser')
+        table = soup.find('table')
+        challenges = [row for row in table.find_all('tr')]
+        challenges.pop(0)
+
+        challenges_dict = []
+
+        for row in challenges:
+            tr = row.find_all('td')
+            challenges_dict.append(
+                (
+                    tr[0].get_text().strip(), 
+                    tr[1].get_text().strip(),
+                    url.rsplit('/', 2)[0] + tr[3].find('img')['src'].split('..')[1]
+                )
+            )
+        con = psycopg2.connect(DATABASE_URL)
+        cur = con.cursor()
+        cur.execute(""" DROP TABLE IF EXISTS challenges_reference CASCADE """)
+        cur.execute(""" CREATE TABLE challenges_reference (
+                            id SERIAL NOT NULL PRIMARY KEY,
+                            name VARCHAR(50),
+                            description VARCHAR(300),
+                            image VARCHAR(100)
+                        ) """)
+        query = """ INSERT INTO challenges_reference(name, description)
+                        VALUES (%s, %s) """
+        cur.executemany(query, challenges_dict)
+        con.commit()
+        await ctx.send(f"{ctx.author.mention} Les challenges ont bien été ajoutés dans la base de données !")
 
     @commands.command()
     @commands.has_role('BG suprême')
@@ -188,15 +225,21 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         for row in challenges:
             tr = row.find_all('td')
-            challenges_dict.append((tr[0].get_text().strip(), tr[1].get_text().strip()))
-
+            challenges_dict.append(
+                (
+                    tr[0].get_text().strip(), 
+                    tr[1].get_text().strip(),
+                    url.rsplit('/', 2)[0] + tr[3].find('img')['src'].split('..')[1]
+                )
+            )
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         cur.execute(""" DROP TABLE IF EXISTS challenges_reference CASCADE """)
         cur.execute(""" CREATE TABLE challenges_reference (
                             id SERIAL NOT NULL PRIMARY KEY,
                             name VARCHAR(50),
-                            description VARCHAR(300)
+                            description VARCHAR(300),
+                            image VARCHAR(100)
                         ) """)
         query = """ INSERT INTO challenges_reference(name, description)
                         VALUES (%s, %s) """
@@ -346,13 +389,12 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                         ORDER BY 2 DESC, members.name ASC"""
             cur.execute(query, (challenge,))
             challs = cur.fetchall()
-            print(challs)
             if len(challs) == 0:
                 await ctx.send("Le challenge n'a pas été raté pour l'instant :sunglasses:")
             else:
                 embed = discord.Embed(
                     title=challenge,
-                    description='Nombre de challenges ratés',
+                    description='Nombre de challenges ratés :',
                     color=discord.Color.gold(),
                 )
                 for chall in challs:
