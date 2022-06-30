@@ -339,23 +339,24 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             cur = con.cursor()
             query = f""" SELECT members.name, COUNT(*)
                         FROM challenges, challenges_reference, members
-                        WHERE challenges_reference.name LIKE '{challenge}'
+                        WHERE challenges_reference.name LIKE "{challenge}"
                         AND challenges.challengeid = challenges_reference.id
                         AND members.discordid = challenges.discordid
                         GROUP BY members.name """
             cur.execute(query)
             challs = cur.fetchall()
             print(challs)
-            # challenges_count = 0
-            # to_print = ""
-            # if len(challs) == 0:
-            #     await ctx.send("Le challenge n'a pas été raté pour l'instant :sunglasses:")
-            # else:
-            #     for chall in challs:
-            #         to_print += f"- **{chall[1]}** fois le challenge **{chall[0]}**\n"
-            #         challenges_count += chall[1]
-            #     to_print = f"{member.nick} a fait rater **{challenges_count}** challenge(s) :\n" + to_print
-            #     await ctx.send(to_print)
+            if len(challs) == 0:
+                await ctx.send("Le challenge n'a pas été raté pour l'instant :sunglasses:")
+            else:
+                embed = discord.Embed(
+                    title=challenge,
+                    description='Nombre de challenges ratés',
+                    color=discord.Color.gold(),
+                )
+                for chall in challs:
+                    embed.add_field(name=chall[0], value=f'{chall[1]} fois')
+                await send_embed(ctx, embed)                
 
     @commands.command()
     @commands.has_any_role('BG suprême', 'BGs originels')
