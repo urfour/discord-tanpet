@@ -339,7 +339,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             cur = con.cursor()
             query = f""" SELECT members.name, COUNT(*)
                         FROM challenges, challenges_reference, members
-                        WHERE challenges_reference.name = {challenge}
+                        WHERE challenges_reference.name = '{challenge}'
                         AND challenges.challengeid = challenges_reference.id
                         AND members.discordid = challenges.discordid
                         GROUP BY name 
