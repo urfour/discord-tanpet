@@ -342,8 +342,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                         WHERE challenges_reference.name = '{challenge}'
                         AND challenges.challengeid = challenges_reference.id
                         AND members.discordid = challenges.discordid
-                        GROUP BY name 
-                        ORDER BY 2 DESC, name ASC """
+                        GROUP BY members.name 
+                        ORDER BY 2 DESC, members.name ASC """
             cur.execute(query)
             challs = cur.fetchall()
             print(challs)
