@@ -373,7 +373,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             await ctx.send(to_print)
 
     @info.error
-    async def info_error(ctx, error):
+    async def info_error(self, ctx, error):
         if isinstance(error, commands.MemberNotFound):
             await ctx.send("Merci de préciser le membre pour lequel vous souhaitez connaître les challenges ratés.")
 
@@ -461,7 +461,8 @@ class MiscCog(commands.Cog, name='Divers'):
                             WHERE discordid = '{member.id}' """
                 cur.execute(query)
             con.commit()
-            print("Les bots ont bien été supprimés")
+            await ctx.send(f"{ctx.author.mention} Les bots ont bien été supprimés de la base de données !")
+            print("Bots supprimés de la base de données")
 
     @commands.command(brief="Dire bonjour (c'est important d'être poli)")
     async def hello(self, ctx):
