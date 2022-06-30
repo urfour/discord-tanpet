@@ -45,15 +45,16 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-    con = psycopg2.connect(DATABASE_URL)
-    cur = con.cursor()
-    query = """ INSERT INTO members 
-                (discordid, name)
-                VALUES (%s, %s)
-                ON CONFLICT (discordid) DO NOTHING"""
-    cur.execute(query, (member.id, member.name))
-    con.commit()
-    print(f"{member.name} a été ajouté à la base de données.")
+    if not member.bot:
+        con = psycopg2.connect(DATABASE_URL)
+        cur = con.cursor()
+        query = """ INSERT INTO members 
+                    (discordid, name)
+                    VALUES (%s, %s)
+                    ON CONFLICT (discordid) DO NOTHING"""
+        cur.execute(query, (member.id, member.name))
+        con.commit()
+        print(f"{member.name} a été ajouté à la base de données.")
 
 class Help(commands.Cog, name='Aide'):
     """
@@ -255,7 +256,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                             PRIMARY KEY (id, discordid)
                         ) """)
         con.commit()
-        members = [(member.id, member.name) for member in ctx.guild.members if bot.user.id != member.id]
+        members = [(member.id, member.name) for member in ctx.guild.members if bot.user.id != member.id and not member.bot]
         query = """ INSERT INTO members(discordid, name)
                     VALUES(%s, %s) """
         cur.executemany(query, members)
@@ -439,6 +440,24 @@ class MiscCog(commands.Cog, name='Divers'):
     """
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    @commands.has_any_role('BG suprême')
+    async def remove_bot(self, ctx):
+        """ Retire les bots de la base de données """
+        members = [member for member in ctx.guild.members if member.bot]
+        if len(members) == 0:
+            print("Aucun bot n'a été supprimé.")
+        else:
+            for member in members:
+                con = psycopg2.connect(DATABASE_URL)
+                cur = con.cursor()
+                query = f""" DELETE FROM members
+                            WHERE discordid = '{member.id}' """
+                cur.execute(query)
+                print(cur.fetchone())
+            con.commit()
+            print("Les bots ont bien été supprimés")
 
     @commands.command(brief="Dire bonjour (c'est important d'être poli)")
     async def hello(self, ctx):
