@@ -56,11 +56,6 @@ async def on_member_join(member):
         con.commit()
         print(f"{member.name} a été ajouté à la base de données.")
 
-@test.error
-async def test_error(ctx, error):
-    if isinstance(error, commands.MemberNotFound):
-        await ctx.send("Le membre en question n'existe pas.")
-
 class Help(commands.Cog, name='Aide'):
     """
     Envoie ce message d'aide
@@ -376,6 +371,11 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                 challenges_count += chall[1]
             to_print = f"{member.nick} a fait rater **{challenges_count}** challenge(s) :\n" + to_print
             await ctx.send(to_print)
+
+    @info.error
+    async def info_error(ctx, error):
+        if isinstance(error, commands.MemberNotFound):
+            await ctx.send("Merci de préciser le membre pour lequel vous souhaitez connaître les challenges ratés.")
 
     @commands.command()
     async def info_chall(self, ctx, challenge : str):
