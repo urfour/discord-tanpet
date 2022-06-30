@@ -74,7 +74,6 @@ class Help(commands.Cog, name='Aide'):
         
         # setting owner name - if you don't wanna be mentioned remove line 49-60 and adjust help text (line 88) 
         owner = '149195176093548544'
-        owner_name = 'Nassime#5430'
 
         # checks if cog parameter was given
         # if not: sending all modules and commands not associated with a cog
@@ -328,6 +327,35 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                 challenges_count += chall[1]
             to_print = f"{member.nick} a fait rater **{challenges_count}** challenge(s) :\n" + to_print
             await ctx.send(to_print)
+
+    @commands.command()
+    async def info_chall(self, ctx, challenge : str):
+        """ Affiche les informations sur un challenge raté """
+
+        if challenge is None:
+            await ctx.send("Sinon si tu me dis de quel challenge il s'agit ce serait plus simple...")
+        else:
+            con = psycopg2.connect(DATABASE_URL)
+            cur = con.cursor()
+            query = f""" SELECT *
+                        FROM challenges, challenges_reference
+                        WHERE challenges_reference.name = challenge
+                        AND challenges.challengeid = challenges_reference.id
+                        GROUP BY name 
+                        ORDER BY 2 DESC, name ASC """
+            cur.execute(query)
+            challs = cur.fetchall()
+            print(challs)
+            # challenges_count = 0
+            # to_print = ""
+            # if len(challs) == 0:
+            #     await ctx.send("Le challenge n'a pas été raté pour l'instant :sunglasses:")
+            # else:
+            #     for chall in challs:
+            #         to_print += f"- **{chall[1]}** fois le challenge **{chall[0]}**\n"
+            #         challenges_count += chall[1]
+            #     to_print = f"{member.nick} a fait rater **{challenges_count}** challenge(s) :\n" + to_print
+            #     await ctx.send(to_print)
 
     @commands.command()
     @commands.has_any_role('BG suprême', 'BGs originels')
