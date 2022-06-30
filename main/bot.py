@@ -401,7 +401,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     description='Nombre de challenges ratés :',
                     color=discord.Color.gold(),
                 )
-                embed.set_thumbnail(image[0])
+                embed.set_thumbnail(url=image[0])
                 for chall in challs:
                     embed.add_field(name=chall[0], value=f'{chall[1]} fois')
                 await send_embed(ctx, embed)                
