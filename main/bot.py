@@ -398,7 +398,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                 image = cur.fetchone()
                 embed = discord.Embed(
                     title=challenge,
-                    description='Nombre de challenges ratés :',
+                    description='Challenges ratés :',
                     color=discord.Color.gold(),
                 )
                 embed.set_thumbnail(url=image[0])
