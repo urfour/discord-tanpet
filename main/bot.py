@@ -387,7 +387,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             con = psycopg2.connect(DATABASE_URL)
             cur = con.cursor()
             query = """ SELECT id FROM challenges_reference
-                        WHERE UPPER(name) LIKE(%s) """
+                        WHERE UPPER(name) LIKE UPPER(%s) """
             cur.execute(query, (challenge,))
             chall_exist = cur.fetchone()
             if chall_exist is None:
