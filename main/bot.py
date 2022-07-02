@@ -386,31 +386,38 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         else:
             con = psycopg2.connect(DATABASE_URL)
             cur = con.cursor()
-            query = """ SELECT members.name, COUNT(*)
-                        FROM challenges, challenges_reference, members
-                        WHERE UPPER(challenges_reference.name) LIKE UPPER(%s)
-                        AND challenges.challengeid = challenges_reference.id
-                        AND members.discordid = challenges.discordid
-                        GROUP BY members.name 
-                        ORDER BY 2 DESC, members.name ASC"""
+            query = """ SELECT id FROM challenges_reference
+                        WHERE UPPER(name) LIKE(%s) """
             cur.execute(query, (challenge,))
-            challs = cur.fetchall()
-            if len(challs) == 0:
-                await ctx.send("Le challenge n'a pas été raté pour l'instant :sunglasses:")
+            chall_exist = cur.fetchone()
+            if chall_exist is None:
+                await ctx.send("Le challenge n'existe pas.")
             else:
-                cur.execute(""" SELECT image
-                                FROM challenges_reference
-                                WHERE UPPER(challenges_reference.name) LIKE UPPER(%s) """, (challenge,))
-                image = cur.fetchone()
-                embed = discord.Embed(
-                    title=challenge,
-                    description='Challenges ratés :',
-                    color=discord.Color.gold(),
-                )
-                embed.set_thumbnail(url=image[0])
-                for chall in challs:
-                    embed.add_field(name=chall[0], value=f'{chall[1]} fois')
-                await send_embed(ctx, embed)                
+                query = """ SELECT members.name, COUNT(*)
+                            FROM challenges, challenges_reference, members
+                            WHERE UPPER(challenges_reference.name) LIKE UPPER(%s)
+                            AND challenges.challengeid = challenges_reference.id
+                            AND members.discordid = challenges.discordid
+                            GROUP BY members.name 
+                            ORDER BY 2 DESC, members.name ASC"""
+                cur.execute(query, (challenge,))
+                challs = cur.fetchall()
+                if len(challs) == 0:
+                    await ctx.send("Le challenge n'a pas été raté pour l'instant :sunglasses:")
+                else:
+                    cur.execute(""" SELECT image
+                                    FROM challenges_reference
+                                    WHERE UPPER(challenges_reference.name) LIKE UPPER(%s) """, (challenge,))
+                    image = cur.fetchone()
+                    embed = discord.Embed(
+                        title=challenge,
+                        description='Challenges ratés :',
+                        color=discord.Color.gold(),
+                    )
+                    embed.set_thumbnail(url=image[0])
+                    for chall in challs:
+                        embed.add_field(name=chall[0], value=f'{chall[1]} fois')
+                    await send_embed(ctx, embed)                
 
     @commands.command()
     @commands.has_any_role('BG suprême', 'BGs originels')
