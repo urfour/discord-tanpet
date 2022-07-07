@@ -309,7 +309,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
-        query = """ SELECT *
+        query = """ SELECT name, description
                     FROM challenges_reference """
         cur.execute(query)
         con.commit()
@@ -319,7 +319,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         embed.set_thumbnail(url=f'https://image.over-blog.com/5ZW7J-uV9A9TuPXKCO3m2LPf7VE=/filters:no_upscale()/image%2F1215535%2F20211125%2Fob_475eb1_cheat-des-devs.png')
 
         for l in challs:
-            embed.add_field(name=l[1], value=l[2], inline=False)
+            embed.add_field(name=l[0], value=l[1], inline=True)
 
         await user.send(embed=embed)
 
