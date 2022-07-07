@@ -321,13 +321,13 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         if len(challs) > 25:
             nb_embed = len(challs) / 25
 
-        for i in nb_embed:
+        for i in range(nb_embed):
             if i == 0:
                 embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange())
             else:
                 embed = discord.Embed(color=discord.Color.orange())
             for l in challs[i*25:i*25+1]:
-                embed.add_field(name=l[0], value=l[1], inline=True)
+                embed.add_field(name=l[0], value=l[1], inline=False)
             await user.send(embed=embed)
 
     @commands.command()
