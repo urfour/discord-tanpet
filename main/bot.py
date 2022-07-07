@@ -319,7 +319,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         embed.set_thumbnail(url=f'https://image.over-blog.com/5ZW7J-uV9A9TuPXKCO3m2LPf7VE=/filters:no_upscale()/image%2F1215535%2F20211125%2Fob_475eb1_cheat-des-devs.png')
 
         if len(challs) > 25:
-            nb_embed = challs / 25
+            nb_embed = len(challs) / 25
 
         for i in nb_embed:
             if i == 0:
