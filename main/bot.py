@@ -318,10 +318,17 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange())
         embed.set_thumbnail(url=f'https://image.over-blog.com/5ZW7J-uV9A9TuPXKCO3m2LPf7VE=/filters:no_upscale()/image%2F1215535%2F20211125%2Fob_475eb1_cheat-des-devs.png')
 
-        for l in challs:
-            embed.add_field(name=l[0], value=l[1], inline=True)
+        if len(challs) > 25:
+            nb_embed = challs / 25
 
-        await user.send(embed=embed)
+        for i in nb_embed:
+            if i == 0:
+                embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange())
+            else:
+                embed = discord.Embed(color=discord.Color.orange())
+            for l in challs[i*25:i*25+1]:
+                embed.add_field(name=l[0], value=l[1], inline=True)
+            await user.send(embed=embed)
 
     @commands.command()
     async def info_all(self, ctx):
