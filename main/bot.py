@@ -1,3 +1,4 @@
+from math import ceil
 import os
 import datetime
 import discord
@@ -321,7 +322,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         if len(challs) > 25:
             nb_embed = len(challs) / 25
 
-        for i in range(nb_embed):
+        for i in range(ceil(nb_embed)):
             if i == 0:
                 embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange())
             else:
