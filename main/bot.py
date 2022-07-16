@@ -327,7 +327,6 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                 embed = discord.Embed(title="Challenges", description="Totalité des challenges disponibles sur Dofus", color=discord.Color.orange())
             else:
                 embed = discord.Embed(color=discord.Color.orange())
-            print(challs)
             for l in challs[i*25:(i+1)*25]:
                 embed.add_field(name=l[0], value=l[1], inline=False)
             await user.send(embed=embed)
@@ -351,6 +350,27 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             to_print = ""
             for row in challs:
                     to_print += f"{row[0]} : {row[1]} challenge(s) raté(s)\n"
+            await ctx.send(to_print)
+
+    @commands.command()
+    async def challs_missed(self, ctx):
+        """ Affiche les challenges les plus ratés """
+
+        con = psycopg2.connect(DATABASE_URL)
+        cur = con.cursor()
+        query = f"""SELECT name, COUNT(*) as nb
+                    FROM challenges, challenges_reference
+                    WHERE challenges.challengeid = challenges_reference.id
+                    GROUP BY name
+                    ORDER BY 2 DESC, name ASC """
+        cur.execute(query)
+        challs = cur.fetchall()
+        if len(challs) == 0:
+            await ctx.send("Félicitations, personne n'a raté de challenge :sunglasses: (pour l'instant...)")
+        else:
+            to_print = ""
+            for row in challs:
+                    to_print += f"{row[0]} : raté {row[1]} fois\n"
             await ctx.send(to_print)
 
     @commands.command()
