@@ -321,6 +321,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
         if len(challs) > 25:
             nb_embed = len(challs) / 25
+        else:
+            nb_embed = 1
 
         for i in range(ceil(nb_embed)):
             if i == 0:
@@ -372,6 +374,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
             if len(challs) > 25:
                 nb_embed = len(challs) / 25
+            else:
+                nb_embed = 1
 
             for i in range(ceil(nb_embed)):
                 if i == 0:
