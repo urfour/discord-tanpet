@@ -351,6 +351,9 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         else:
             to_print = ""
             for row in challs:
+                if row[1] == 1:
+                    to_print += f"{row[0]} : {row[1]} challenge raté\n"
+                else:
                     to_print += f"{row[0]} : {row[1]} challenge(s) raté(s)\n"
             await ctx.send(to_print)
 
@@ -414,7 +417,11 @@ class ChallengesCog(commands.Cog, name='Challenges'):
             for chall in challs:
                 to_print += f"- **{chall[1]}** fois le challenge **{chall[0]}**\n"
                 challenges_count += chall[1]
-            to_print = f"{member.nick} a fait rater **{challenges_count}** challenge(s) :\n" + to_print
+            if challenges_count == 1:
+                challs_missed = "challenge"
+            else:
+                challs_missed = "challenge(s)"
+            to_print = f"{member.nick} a fait rater **{challenges_count}** {challs_missed} :\n" + to_print
             await ctx.send(to_print)
 
     @info.error
