@@ -370,7 +370,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         if len(challs) == 0:
             await ctx.send("Félicitations, personne n'a raté de challenge :sunglasses: (pour l'instant...)")
         else:
-            embed = discord.Embed(title="Challenges", description="Totalité des challenges ratés actuellement", color=discord.Color.red())
+            embed = discord.Embed(title="Challenges", description="Totalité des challenges ratés", color=discord.Color.red())
 
             if len(challs) > 25:
                 nb_embed = len(challs) / 25
@@ -383,7 +383,10 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                 else:
                     embed = discord.Embed(color=discord.Color.red())
                 for l in challs[i*25:(i+1)*25]:
-                    embed.add_field(name=l[0], value=f"{l[1]} échec(s)", inline=True)
+                    if l[1] == 1:
+                        embed.add_field(name=l[0], value=f"{l[1]} échec", inline=True)
+                    else:
+                        embed.add_field(name=l[0], value=f"{l[1]} échec(s)", inline=True)
                 await ctx.send(embed=embed)
 
     @commands.command()
