@@ -454,7 +454,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
             for i in range(ceil(nb_embed)):
                 if i == 0:
-                    embed = discord.Embed(title="Challenges ratés", color=discord.Color.red())
+                    embed = discord.Embed(title=f"Challenges ratés par {member.display_name}", color=discord.Color.red())
                 else:
                     embed = discord.Embed(color=discord.Color.red())
                 for j, row in enumerate(challs[i*25:(i+1)*25]):
