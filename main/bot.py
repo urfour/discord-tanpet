@@ -372,7 +372,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
             for i in range(ceil(nb_embed)):
                 if i == 0:
-                    embed = discord.Embed(title="Challenges", description="Challenges ratés par les différents membres", color=discord.Color.purple())
+                    embed = discord.Embed(title="Nombre de challenges ratés", color=discord.Color.purple())
                 else:
                     embed = discord.Embed(color=discord.Color.purple())
                 for l in challs[i*25:(i+1)*25]:
@@ -382,7 +382,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     else:
                         to_print = "challenges ratés"
                     embed.add_field(name=user.display_name, value=f"{l[1]} {to_print}", inline=True)
-                await user.send(embed=embed)
+                await ctx.send(embed=embed)
 
     @commands.command()
     async def challs_missed(self, ctx):
