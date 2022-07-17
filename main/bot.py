@@ -317,11 +317,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     WHERE id = (SELECT MAX(id) FROM challenges) """
         cur.execute(query)
         con.commit()
-        row = cur.fetchone()
-        if row is None:
-            await ctx.send("Ce challenge n'existe pas, ou celui-ci n'a pas été renseigné.")
-        else:
-            await ctx.send(f"Le dernier challenge ajouté au joueur a bien été retiré, désolé pour l'erreur !")
+        await ctx.send(f"Le dernier challenge ajouté au joueur a bien été retiré, désolé pour l'erreur !")
 
     @commands.command()
     async def challs(self, ctx):
