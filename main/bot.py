@@ -377,11 +377,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     embed = discord.Embed(color=discord.Color.purple())
                 for l in challs[i*25:(i+1)*25]:
                     user = discord.utils.get(ctx.guild.members, name=l[0])
-                    if l[1] == 1:
-                        to_print = "challenge raté"
-                    else:
-                        to_print = "challenges ratés"
-                    embed.add_field(name=user.display_name, value=f"{l[1]} {to_print}", inline=True)
+                    embed.add_field(name=user.display_name, value=f"{l[1]} 'challenge'{'s' if l[1] == 1 else ''}", inline=True)
                 await ctx.send(embed=embed)
 
     @commands.command()
@@ -400,7 +396,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         if len(challs) == 0:
             await ctx.send("Félicitations, personne n'a raté de challenge :sunglasses: (pour l'instant...)")
         else:
-            embed = discord.Embed(title="Challenges", description="Totalité des challenges ratés", color=discord.Color.red())
+            embed = discord.Embed(title="Totalité des challenges ratés", color=discord.Color.red())
 
             if len(challs) > 25:
                 nb_embed = len(challs) / 25
