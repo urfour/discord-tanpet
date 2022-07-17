@@ -304,6 +304,26 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                 await ctx.send(row[0])
 
     @commands.command()
+    @commands.has_role('BG suprême')
+    async def remove_last_chall(self, ctx, member : discord.Member):
+        """ Supprime l'entrée du dernier challenge ajouté """
+
+        if member is None:
+            member = ctx.author
+
+        con = psycopg2.connect(DATABASE_URL)
+        cur = con.cursor()
+        query = """ DELETE FROM challenges
+                    ORDER BY id DESC LIMIT 1 """
+        cur.execute(query)
+        con.commit()
+        row = cur.fetchone()
+        if row is None:
+            await ctx.send("Ce challenge n'existe pas, ou celui-ci n'a pas été renseigné.")
+        else:
+            await ctx.send(f"Le dernier challenge ajouté au joueur a bien été retiré, désolé pour l'erreur !")
+
+    @commands.command()
     async def challs(self, ctx):
         """ Affiche tous les challenges existants """
         user = await self.bot.fetch_user(ctx.author.id)
