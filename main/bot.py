@@ -377,7 +377,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     embed = discord.Embed(color=discord.Color.purple())
                 for l in challs[i*25:(i+1)*25]:
                     user = discord.utils.get(ctx.guild.members, name=l[0])
-                    embed.add_field(name=user.display_name, value=f"{l[1]} 'challenge'{'s' if l[1] == 1 else ''}", inline=True)
+                    embed.add_field(name=user.display_name, value=f"{l[1]} challenge{'s' if l[1] != 1 else ''}", inline=True)
                 await ctx.send(embed=embed)
 
     @commands.command()
