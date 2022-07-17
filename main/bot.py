@@ -375,9 +375,17 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     embed = discord.Embed(title="Nombre de challenges ratés", color=discord.Color.purple())
                 else:
                     embed = discord.Embed(color=discord.Color.purple())
-                for l in challs[i*25:(i+1)*25]:
-                    user = discord.utils.get(ctx.guild.members, name=l[0])
-                    embed.add_field(name=user.display_name, value=f"{l[1]} challenge{'s' if l[1] != 1 else ''}", inline=True)
+                for j, row in enumerate(challs[i*25:(i+1)*25]):
+                    user = discord.utils.get(ctx.guild.members, name=row[0])
+                    if j == 0 and i == 0:
+                        name = ':first_place: ' + user.display_name
+                    elif j == 0 and i == 1:
+                        name = ':second_place: ' + user.display_name
+                    elif j == 0 and i == 2:
+                        name = ':third_place: ' + user.display_name
+                    else:
+                        name = user.display_name
+                    embed.add_field(name=name, value=f"{row[1]} challenge{'s' if row[1] != 1 else ''}", inline=True)
                 await ctx.send(embed=embed)
 
     @commands.command()
