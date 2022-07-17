@@ -55,7 +55,7 @@ async def on_member_join(member):
                     ON CONFLICT (discordid) DO NOTHING"""
         cur.execute(query, (member.id, member.name))
         con.commit()
-        print(f"{member.name} a été ajouté à la base de données.")
+        print(f"{member.display_name} a été ajouté à la base de données.")
 
 class Help(commands.Cog, name='Aide'):
     """
@@ -305,7 +305,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
 
     @commands.command()
     @commands.has_role('BG suprême')
-    async def remove_last_chall(self, ctx, member : discord.Member):
+    async def remove_last_chall(self, ctx, member : discord.Member = None):
         """ Supprime l'entrée du dernier challenge ajouté """
 
         if member is None:
@@ -428,7 +428,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         challenges_count = 0
         to_print = ""
         if len(challs) == 0:
-            await ctx.send(f"{member.nick} n'a fait rater **aucun** challenge (quel bg !)")
+            await ctx.send(f"{member.display_name} n'a fait rater **aucun** challenge (quel bg !)")
         else:
             for chall in challs:
                 to_print += f"- **{chall[1]}** fois le challenge **{chall[0]}**\n"
@@ -437,7 +437,7 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                 challs_missed = "challenge"
             else:
                 challs_missed = "challenge(s)"
-            to_print = f"{member.nick} a fait rater **{challenges_count}** {challs_missed} :\n" + to_print
+            to_print = f"{member.display_name} a fait rater **{challenges_count}** {challs_missed} :\n" + to_print
             await ctx.send(to_print)
 
     @info.error
