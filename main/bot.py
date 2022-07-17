@@ -365,14 +365,24 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         if len(challs) == 0:
             await ctx.send("Félicitations, personne n'a raté de challenge :sunglasses: (pour l'instant...)")
         else:
-            to_print = ""
-            for row in challs:
-                user = discord.utils.get(ctx.guild.members, name=row[0])
-                if row[1] == 1:
-                    to_print += f"{user.display_name} : {row[1]} challenge raté\n"
+            if len(challs) > 25:
+                nb_embed = len(challs) / 25
+            else:
+                nb_embed = 1
+
+            for i in range(ceil(nb_embed)):
+                if i == 0:
+                    embed = discord.Embed(title="Challenges", description="Challenges ratés par les différents membres", color=discord.Color.purple())
                 else:
-                    to_print += f"{user.display_name} : {row[1]} challenge(s) raté(s)\n"
-            await ctx.send(to_print)
+                    embed = discord.Embed(color=discord.Color.purple())
+                for l in challs[i*25:(i+1)*25]:
+                    user = discord.utils.get(ctx.guild.members, name=challs[i][0])
+                    if challs[i][1] == 1:
+                        to_print = "challenge raté"
+                    else:
+                        to_print = "challenges ratés"
+                    embed.add_field(name=user.display_name, value=f"{l[1]} {to_print}", inline=True)
+                await user.send(embed=embed)
 
     @commands.command()
     async def challs_missed(self, ctx):
