@@ -1,6 +1,7 @@
 from math import ceil
 import os
 import datetime
+from re import I
 import discord
 import random
 import requests
@@ -377,11 +378,11 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     embed = discord.Embed(color=discord.Color.purple())
                 for j, row in enumerate(challs[i*25:(i+1)*25]):
                     user = discord.utils.get(ctx.guild.members, name=row[0])
-                    if j == 0 and i == 0:
+                    if i == 0 and j == 0:
                         name = ':first_place: ' + user.display_name
-                    elif j == 0 and i == 1:
+                    elif i == 0 and j == 1:
                         name = ':second_place: ' + user.display_name
-                    elif j == 0 and i == 2:
+                    elif i == 0 and j == 2:
                         name = ':third_place: ' + user.display_name
                     else:
                         name = user.display_name
