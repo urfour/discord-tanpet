@@ -367,10 +367,11 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         else:
             to_print = ""
             for row in challs:
+                user = discord.utils.get(ctx.guild.members, name=row[0])
                 if row[1] == 1:
-                    to_print += f"{row[0]} : {row[1]} challenge raté\n"
+                    to_print += f"{user.display_name} : {row[1]} challenge raté\n"
                 else:
-                    to_print += f"{row[0]} : {row[1]} challenge(s) raté(s)\n"
+                    to_print += f"{user.display_name} : {row[1]} challenge(s) raté(s)\n"
             await ctx.send(to_print)
 
     @commands.command()
