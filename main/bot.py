@@ -441,20 +441,33 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                     ORDER BY 2 DESC, name ASC """
         cur.execute(query)
         challs = cur.fetchall()
-        challenges_count = 0
-        to_print = ""
+
         if len(challs) == 0:
             await ctx.send(f"{member.display_name} n'a fait rater **aucun** challenge (quel bg !)")
         else:
-            for chall in challs:
-                to_print += f"- **{chall[1]}** fois le challenge **{chall[0]}**\n"
-                challenges_count += chall[1]
-            if challenges_count == 1:
-                challs_missed = "challenge"
+            embed = discord.Embed(title="Totalité des challenges ratés", color=discord.Color.red())
+
+            if len(challs) > 25:
+                nb_embed = len(challs) / 25
             else:
-                challs_missed = "challenge(s)"
-            to_print = f"{member.display_name} a fait rater **{challenges_count}** {challs_missed} :\n" + to_print
-            await ctx.send(to_print)
+                nb_embed = 1
+
+            for i in range(ceil(nb_embed)):
+                if i == 0:
+                    embed = discord.Embed(title="Challenges ratés", color=discord.Color.red())
+                else:
+                    embed = discord.Embed(color=discord.Color.red())
+                for j, row in enumerate(challs[i*25:(i+1)*25]):
+                    if i == 0 and j == 0:
+                        name = ':first_place: ' + row[0]
+                    elif i == 0 and j == 1:
+                        name = ':second_place: ' + row[0]
+                    elif i == 0 and j == 2:
+                        name = ':third_place: ' + row[0]
+                    else:
+                        name = row[0]
+                    embed.add_field(name=name, value=f"{row[1]} échec{'s' if row[1] != 1 else ''}", inline=True)
+                await ctx.send(embed=embed)
 
     @info.error
     async def info_error(self, ctx, error):
