@@ -376,8 +376,8 @@ class ChallengesCog(commands.Cog, name='Challenges'):
                 else:
                     embed = discord.Embed(color=discord.Color.purple())
                 for l in challs[i*25:(i+1)*25]:
-                    user = discord.utils.get(ctx.guild.members, name=challs[i][0])
-                    if challs[i][1] == 1:
+                    user = discord.utils.get(ctx.guild.members, name=l[0])
+                    if l[1] == 1:
                         to_print = "challenge raté"
                     else:
                         to_print = "challenges ratés"
