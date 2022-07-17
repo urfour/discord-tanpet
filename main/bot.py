@@ -314,7 +314,9 @@ class ChallengesCog(commands.Cog, name='Challenges'):
         con = psycopg2.connect(DATABASE_URL)
         cur = con.cursor()
         query = """ DELETE FROM challenges
-                    ORDER BY id DESC LIMIT 1 """
+                    WHERE id IN
+                        (SELECT TOP 1 id FROM challenges
+                            ORDER BY id DESC) """
         cur.execute(query)
         con.commit()
         row = cur.fetchone()
