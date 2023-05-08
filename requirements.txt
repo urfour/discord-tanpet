@@ -1,7 +1,5 @@
-discord
+nextcord
 python-dotenv
-pandas
 psycopg2
-sqlalchemy
 requests
 bs4
